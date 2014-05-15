@@ -254,8 +254,10 @@ print(NAs)
 
 <p>Replace NAs in steps with mean for that paricular interval:</p>
 
+<p>Use the group average function &ldquo;ave&rdquo; to calculate the average number of steps for each interval.  Apply this only to values in data$steps where is.na = TRUE</p>
+
 <pre><code class="r">data$steps[is.na(data$steps)] &lt;- with(data, ave(steps, interval, FUN = function(x) mean(x, 
-    na.rm = TRUE)))[is.na(data$steps)]
+    na.rm = T)))[is.na(data$steps)]
 </code></pre>
 
 <p>Make sure there are no NAs left in the steps column:</p>
