@@ -1,0 +1,190 @@
+# Reproducible Research: Peer Assessment 1
+
+
+## Loading and preprocessing the data
+
+Load the data using the following:
+
+
+```r
+data <- read.csv("activity.csv")
+```
+
+
+
+## What is mean total number of steps taken per day?
+
+First, here's a histogram showing the total number of steps each day:
+
+
+```r
+
+total <- tapply(data$steps, data$date, sum)
+
+hist(total, main = "Number of Steps", xlab = "Total Steps per Day", ylab = "Frequency")
+```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+
+
+The mean and median steps are given by:
+
+
+```r
+mean(total, na.rm = T)
+```
+
+```
+## [1] 10766
+```
+
+```r
+
+median(total, na.rm = T)
+```
+
+```
+## [1] 10765
+```
+
+
+## What is the average daily activity pattern?
+
+
+```r
+intervals <- as.numeric(labels(split(data$interval, data$interval)))
+plot(intervals, tapply(data$steps, data$interval, mean, na.rm = T), type = "l", 
+    xlab = "Interval", ylab = "Mean Number of Steps")
+```
+
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4.png) 
+
+
+The interval with the maximum average number of steps is interval 835, with a value of roughly 206.  Can be shown via the following:
+
+```r
+avg <- tapply(data$steps, data$interval, mean, na.rm = T)
+avg[avg == max(avg)]
+```
+
+```
+##   835 
+## 206.2
+```
+
+
+## Imputing missing values
+
+Find total number of NAs:
+
+```r
+date.nas <- is.na(data$date)
+intv.nas <- is.na(data$interval)
+steps.nas <- is.na(data$steps)
+
+NAs <- data.frame(`Total Date NAs` = sum(date.nas), `Total Interval NAs` = sum(intv.nas), 
+    `Total Step NAs` = sum(steps.nas))
+
+library(xtable)
+xt <- xtable(NAs)
+print(xt, type = "html")
+```
+
+```
+## <!-- html table generated in R 3.0.1 by xtable 1.7-3 package -->
+## <!-- Wed May 14 21:32:17 2014 -->
+## <TABLE border=1>
+## <TR> <TH>  </TH> <TH> Total.Date.NAs </TH> <TH> Total.Interval.NAs </TH> <TH> Total.Step.NAs </TH>  </TR>
+##   <TR> <TD align="right"> 1 </TD> <TD align="right">   0 </TD> <TD align="right">   0 </TD> <TD align="right"> 2304 </TD> </TR>
+##    </TABLE>
+```
+
+
+Replace NAs with mean for that interval:
+
+```r
+data$steps[is.na(data$steps)] <- with(data, ave(steps, interval, FUN = function(x) mean(x, 
+    na.rm = TRUE)))[is.na(data$steps)]
+```
+
+
+Make sure there are no NAs left in the steps column:
+
+```r
+sum(is.na(data$steps))
+```
+
+```
+## [1] 0
+```
+
+
+
+
+```r
+total <- tapply(data$steps, data$date, sum)
+
+hist(total, main = "Number of Steps", xlab = "Total Steps per Day", ylab = "Frequency")
+```
+
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
+
+
+The mean and median steps are given by:
+
+
+```r
+mean(total)
+```
+
+```
+## [1] 10766
+```
+
+```r
+
+median(total)
+```
+
+```
+## [1] 10766
+```
+
+
+Imputing the NAs didn't seem to make a difference in the mean total value but did bring the median up 1 step.
+
+## Are there differences in activity patterns between weekdays and weekends?
+
+Create days column:
+
+```r
+data$days <- weekdays(as.Date(data$date))
+```
+
+
+Separate days into weekdays and weekends:
+
+
+```r
+data$day.type <- ifelse((data$days == "Saturday" | data$days == "Sunday"), "weekend", 
+    "weekday")
+data$day.type <- factor(data$day.type)
+```
+
+
+Average steps across each interval for weekdays and weekends:
+
+```r
+avg <- aggregate(steps ~ interval + day.type, data = data, FUN = "mean")
+```
+
+
+Plot the results:
+
+```r
+library(lattice)
+xyplot(steps ~ interval | day.type, data = avg, type = "l", layout = c(1, 2))
+```
+
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14.png) 
+
