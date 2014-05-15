@@ -245,20 +245,14 @@ steps.nas &lt;- is.na(data$steps)
 NAs &lt;- data.frame(`Total Date NAs` = sum(date.nas), `Total Interval NAs` = sum(intv.nas), 
     `Total Step NAs` = sum(steps.nas))
 
-library(xtable)
-xt &lt;- xtable(NAs)
-print(xt, type = &quot;html&quot;)
+print(NAs)
 </code></pre>
 
-<pre><code>## &lt;!-- html table generated in R 3.0.1 by xtable 1.7-3 package --&gt;
-## &lt;!-- Wed May 14 21:32:17 2014 --&gt;
-## &lt;TABLE border=1&gt;
-## &lt;TR&gt; &lt;TH&gt;  &lt;/TH&gt; &lt;TH&gt; Total.Date.NAs &lt;/TH&gt; &lt;TH&gt; Total.Interval.NAs &lt;/TH&gt; &lt;TH&gt; Total.Step.NAs &lt;/TH&gt;  &lt;/TR&gt;
-##   &lt;TR&gt; &lt;TD align=&quot;right&quot;&gt; 1 &lt;/TD&gt; &lt;TD align=&quot;right&quot;&gt;   0 &lt;/TD&gt; &lt;TD align=&quot;right&quot;&gt;   0 &lt;/TD&gt; &lt;TD align=&quot;right&quot;&gt; 2304 &lt;/TD&gt; &lt;/TR&gt;
-##    &lt;/TABLE&gt;
+<pre><code>##   Total.Date.NAs Total.Interval.NAs Total.Step.NAs
+## 1              0                  0           2304
 </code></pre>
 
-<p>Replace NAs with mean for that interval:</p>
+<p>Replace NAs in steps with mean for that paricular interval:</p>
 
 <pre><code class="r">data$steps[is.na(data$steps)] &lt;- with(data, ave(steps, interval, FUN = function(x) mean(x, 
     na.rm = TRUE)))[is.na(data$steps)]

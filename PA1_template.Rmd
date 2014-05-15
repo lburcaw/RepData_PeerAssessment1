@@ -56,12 +56,10 @@ NAs <- data.frame("Total Date NAs" = sum(date.nas),
                   "Total Interval NAs" = sum(intv.nas),
                   "Total Step NAs" = sum(steps.nas))
 
-library(xtable)
-xt <- xtable(NAs)
-print(xt,type="html")
+print(NAs)
 ```
 
-Replace NAs with mean for that interval:
+Replace NAs in steps with mean for that paricular interval:
 ```{r}
 data$steps[is.na(data$steps)] <- with(data, ave(steps, interval, 
    FUN = function(x) mean(x, na.rm = TRUE)))[is.na(data$steps)]
